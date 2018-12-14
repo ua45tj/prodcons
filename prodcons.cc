@@ -21,7 +21,7 @@ class RaiiLogFunc {
   std::string name_;
 };
 
-#define RAII_LOG_FUNC RaiiLogFunc(__func__)
+#define RAII_LOG_FUNC RaiiLogFunc raii_log_func(__func__)
 
 std::mutex mutex;
 std::queue<int> queue;
