@@ -5,6 +5,7 @@
 #include <thread>
 #include <mutex>
 #include <iostream>
+#include <algorithm>
 #include <unistd.h> // TODO Replace with C++11 sleep
 
 class RaiiLogFunc {
@@ -25,6 +26,7 @@ class RaiiLogFunc {
 
 std::mutex mutex;
 std::queue<int> queue;
+int queue_max_size = 0;
 
 int BuildItem() {
   // TODO Replace with C++11 random
@@ -34,6 +36,7 @@ int BuildItem() {
 void ProduceItem() {
   std::lock_guard<std::mutex> lock(mutex);
   queue.push(BuildItem());
+  queue_max_size = std::max(queue_max_size, static_cast<int>(queue.size()));
 }
 
 void HandleItem(int item) {
@@ -94,6 +97,7 @@ int main(int argc, char* argv[]) {
 
   std::cout << std::endl;
   std::cout << "queue.size() " << queue.size() << std::endl;
+  std::cout << "queue_max_size " << queue_max_size << std::endl;
 
   return 0;
 }
