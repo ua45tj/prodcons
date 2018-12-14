@@ -27,6 +27,7 @@ class RaiiLogFunc {
 std::mutex mutex;
 std::queue<int> queue;
 int queue_max_size = 0;
+int total_produced = 0;
 
 int BuildItem() {
   static std::random_device rd;
@@ -41,6 +42,7 @@ void ProduceItem() {
   std::lock_guard<std::mutex> lock(mutex);
   queue.push(BuildItem());
   queue_max_size = std::max(queue_max_size, static_cast<int>(queue.size()));
+  ++total_produced;
 }
 
 void HandleItem(int item) {
@@ -101,6 +103,7 @@ int main(int argc, char* argv[]) {
   std::cout << std::endl;
   std::cout << "queue.size() " << queue.size() << std::endl;
   std::cout << "queue_max_size " << queue_max_size << std::endl;
+  std::cout << "total_produced " << total_produced << std::endl;
 
   return 0;
 }
