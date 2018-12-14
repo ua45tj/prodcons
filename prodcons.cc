@@ -6,7 +6,6 @@
 #include <mutex>
 #include <iostream>
 #include <algorithm>
-#include <unistd.h> // TODO Replace with C++11 sleep
 
 class RaiiLogFunc {
  public:
@@ -62,8 +61,7 @@ void ConsumeItem() {
 }
 
 void Sleep() {
-  // TODO Replace with C++11 sleep
-  usleep(10);
+  std::this_thread::sleep_for(std::chrono::microseconds(10));
 }
 
 void ProducerThread() {
