@@ -6,6 +6,7 @@
 #include <mutex>
 #include <iostream>
 #include <algorithm>
+#include <random>
 
 class RaiiLogFunc {
  public:
@@ -28,8 +29,12 @@ std::queue<int> queue;
 int queue_max_size = 0;
 
 int BuildItem() {
-  // TODO Replace with C++11 random
-  return rand();
+  static std::random_device rd;
+  static std::mt19937 generator(rd());
+  static std::uniform_int_distribution<> distribution(0, 9);
+
+  const int item = distribution(generator);
+  return item;
 }
 
 void ProduceItem() {
