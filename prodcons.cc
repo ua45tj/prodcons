@@ -94,11 +94,20 @@ void ConsumerThread() {
 int main(int argc, char* argv[]) {
   RAII_LOG_FUNC;
 
-  std::thread producer_thread(ProducerThread);
-  std::thread consumer_thread(ConsumerThread);
+  std::thread producer_thread1(ProducerThread);
+  std::thread producer_thread2(ProducerThread);
+  std::thread producer_thread3(ProducerThread);
 
-  producer_thread.join();
-  consumer_thread.join();
+  std::thread consumer_thread1(ConsumerThread);
+  std::thread consumer_thread2(ConsumerThread);
+  std::thread consumer_thread3(ConsumerThread);
+
+  producer_thread1.join();
+  producer_thread2.join();
+  producer_thread3.join();
+  consumer_thread1.join();
+  consumer_thread2.join();
+  consumer_thread3.join();
 
   std::cout << std::endl;
   std::cout << "queue.size() " << queue.size() << std::endl;
