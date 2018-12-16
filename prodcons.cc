@@ -30,9 +30,9 @@ int queue_max_size = 0;
 int total_produced = 0;
 
 int BuildItem() {
-  static std::random_device rd;
-  static std::mt19937 generator(rd());
-  static std::uniform_int_distribution<> distribution(0, 9);
+  thread_local std::random_device rd;
+  thread_local std::mt19937 generator(rd());
+  thread_local std::uniform_int_distribution<> distribution(0, 9);
 
   const int item = distribution(generator);
   return item;
