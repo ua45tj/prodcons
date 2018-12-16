@@ -1,6 +1,3 @@
-// !g++ -std=c++11 -pthread prodcons.cc && ./a.out
-// TODO Add a build system: Makefile or CMake
-
 #include <queue>
 #include <thread>
 #include <mutex>
