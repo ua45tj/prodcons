@@ -16,5 +16,5 @@ target_link_libraries(prodcons
 
 target_sources(prodcons
  PRIVATE
-  prodcons.cc
+  src/prodcons.cc
 )
