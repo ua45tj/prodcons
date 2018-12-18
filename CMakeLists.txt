@@ -17,4 +17,5 @@ target_link_libraries(prodcons
 target_sources(prodcons
  PRIVATE
   src/prodcons.cc
+  src/raii_log_func.h
 )

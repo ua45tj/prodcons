@@ -5,21 +5,7 @@
 #include <algorithm>
 #include <random>
 
-class RaiiLogFunc {
- public:
-  RaiiLogFunc(const std::string& name) 
-      : name_(name) {
-    std::cout << name_ << " ENTER" << std::endl;
-  }
-  ~RaiiLogFunc() {
-    std::cout << name_ << " EXIT" << std::endl;
-  }
- 
- private:
-  std::string name_;
-};
-
-#define RAII_LOG_FUNC RaiiLogFunc raii_log_func(__func__)
+#include "raii_log_func.h"
 
 std::mutex mutex;
 std::queue<int> queue;
@@ -68,9 +54,7 @@ void Sleep() {
   std::this_thread::sleep_for(std::chrono::microseconds(10));
 }
 
-void ProducerThread() {
-  RAII_LOG_FUNC;
-  
+void ProducerThread() { RAII_LOG_FUNC;
   for (int i = 0; i < 1000; ++i) {
     std::cout << 'p';
     ProduceItem();
@@ -78,9 +62,7 @@ void ProducerThread() {
   }
 }
 
-void ConsumerThread() {
-  RAII_LOG_FUNC;
-
+void ConsumerThread() { RAII_LOG_FUNC;
   for (int i = 0; i < 1000; ++i) {
     std::cout << 'c';
     ConsumeItem();
@@ -88,9 +70,7 @@ void ConsumerThread() {
   }
 }
 
-int main(int argc, char* argv[]) {
-  RAII_LOG_FUNC;
-
+int main(int argc, char* argv[]) { RAII_LOG_FUNC;
   std::thread producer_thread1(ProducerThread);
   std::thread producer_thread2(ProducerThread);
   std::thread producer_thread3(ProducerThread);
