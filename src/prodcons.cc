@@ -1,3 +1,5 @@
+#include "prodcons.h"
+
 #include <queue>
 #include <thread>
 #include <mutex>
@@ -6,6 +8,8 @@
 #include <random>
 
 #include "raii_log_func.h"
+
+namespace {
 
 std::mutex mutex;
 std::queue<int> queue;
@@ -70,7 +74,12 @@ void ConsumerThread() { RAII_LOG_FUNC;
   }
 }
 
-int main(int argc, char* argv[]) { RAII_LOG_FUNC;
+}  // namespace
+
+Prodcons::Prodcons(int argc, char* argv[]) { RAII_LOG_FUNC;
+}
+
+int Prodcons::Run() { RAII_LOG_FUNC;
   std::thread producer_thread1(ProducerThread);
   std::thread producer_thread2(ProducerThread);
   std::thread producer_thread3(ProducerThread);
