@@ -1,34 +1,33 @@
 #include "prodcons.h"
 
-#include <queue>
-#include <thread>
-#include <mutex>
-#include <iostream>
 #include <algorithm>
+#include <iostream>
+#include <mutex>
+#include <queue>
 #include <random>
+#include <thread>
 
+#include "my_queue.h"
 #include "raii_log_func.h"
 
 namespace {
 
-std::mutex mutex;
-std::queue<int> queue;
+MyQueue my_queue;
 int queue_max_size = 0;
 int total_produced = 0;
 
 int BuildItem() {
   thread_local std::random_device rd;
   thread_local std::mt19937 generator(rd());
-  thread_local std::uniform_int_distribution<> distribution(0, 9);
+  thread_local std::uniform_int_distribution<> distribution(1, 9);
 
   const int item = distribution(generator);
   return item;
 }
 
 void ProduceItem() {
-  std::lock_guard<std::mutex> lock(mutex);
-  queue.push(BuildItem());
-  queue_max_size = std::max(queue_max_size, static_cast<int>(queue.size()));
+  my_queue.Push(BuildItem());
+  queue_max_size = std::max(queue_max_size, static_cast<int>(my_queue.Size()));
   ++total_produced;
 }
 
@@ -37,17 +36,8 @@ void HandleItem(int item) {
 }
 
 void ConsumeItem() {
-  int item;
-  int has_consumed_item = false;
-
-  {
-    std::lock_guard<std::mutex> lock(mutex);
-    if (queue.size() > 0) {
-      item = queue.front();
-      queue.pop();
-      has_consumed_item = true;
-    }
-  }
+  int item = my_queue.Pop();
+  int has_consumed_item = (item != 0);
 
   if (has_consumed_item) {
     HandleItem(item);
@@ -96,7 +86,7 @@ int Prodcons::Run() { RAII_LOG_FUNC;
   consumer_thread3.join();
 
   std::cout << std::endl;
-  std::cout << "queue.size() " << queue.size() << std::endl;
+  std::cout << "my_queue.size() " << my_queue.Size() << std::endl;
   std::cout << "queue_max_size " << queue_max_size << std::endl;
   std::cout << "total_produced " << total_produced << std::endl;
 
