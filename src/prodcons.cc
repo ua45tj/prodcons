@@ -1,6 +1,7 @@
 #include "prodcons.h"
 
 #include <algorithm>
+#include <condition_variable>
 #include <iostream>
 #include <mutex>
 #include <queue>
@@ -12,7 +13,11 @@
 
 namespace {
 
-MyQueue my_queue;
+MyQueue my_queue;  // Thread safe queue implementation.
+std::condition_variable cv;
+std::mutex cv_mutex;
+bool is_ready = false;
+bool has_stopped = false;
 int queue_max_size = 0;
 int total_produced = 0;
 
@@ -26,9 +31,14 @@ int BuildItem() {
 }
 
 void ProduceItem() {
-  my_queue.Push(BuildItem());
-  queue_max_size = std::max(queue_max_size, static_cast<int>(my_queue.Size()));
-  ++total_produced;
+  int item = BuildItem();
+  {
+    my_queue.Push(item);
+    queue_max_size = std::max(queue_max_size, static_cast<int>(my_queue.Size()));
+    ++total_produced;
+    is_ready = true;
+  }
+  cv.notify_one();
 }
 
 void HandleItem(int item) {
@@ -36,8 +46,15 @@ void HandleItem(int item) {
 }
 
 void ConsumeItem() {
+  std::unique_lock<std::mutex> lock(cv_mutex);
+  cv.wait(lock, []{ return is_ready || (my_queue.Size() > 0) || has_stopped; });
+  if (has_stopped) {
+    return;
+  }
   int item = my_queue.Pop();
   int has_consumed_item = (item != 0);
+  is_ready = false;
+  lock.unlock();
 
   if (has_consumed_item) {
     HandleItem(item);
@@ -81,6 +98,13 @@ int Prodcons::Run() { RAII_LOG_FUNC;
   producer_thread1.join();
   producer_thread2.join();
   producer_thread3.join();
+
+  {
+    std::lock_guard<std::mutex> lock(cv_mutex);
+    has_stopped = true;
+  }
+  cv.notify_all();
+
   consumer_thread1.join();
   consumer_thread2.join();
   consumer_thread3.join();
